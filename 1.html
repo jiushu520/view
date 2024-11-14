@@ -224,7 +224,7 @@
             this.currentConfigIndex = 0; // 默认使用第一个配置
             this.SYSTEM_MESSAGE = {
                 "role": "system",
-                "content": "理解内容，并用html生成一个完整代码解题的动图，尽量以图片变换的形式显示出来，如果可以的话加上步骤可控按键，。"
+                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。图形变化通过颜色、线条、形状、大小等方式展示，不同步骤通过按钮控制，用户可以通过操作按钮或者滑块观察参数变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强"
             };
             this.messages = [this.SYSTEM_MESSAGE];
             this.initElements();
