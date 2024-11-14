@@ -80,7 +80,7 @@
             border: 2px solid #ccc;
             resize: vertical;
             font-size: 1em;
-            margin-right: 10px; /* 添加右边距 */
+            margin-right: 10px;
             overflow: hidden;
             min-height: 40px;
         }
@@ -96,7 +96,7 @@
         }
         #refresh-btn {
             background-color: #28a745;
-            margin-top: 10px;   /* 增加上间距 */
+            margin-top: 10px;
         }
         #send-btn:disabled {
             background-color: grey;
@@ -129,6 +129,37 @@
             font-size: 0.8em;
             color: #555;
             margin-left: 10px;
+        }
+        /* 复制按钮的样式 */
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 复制成功提示的样式 */
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
         }
     </style>
 </head>
@@ -189,10 +220,6 @@
                     model: "qwen-plus",
                     temperature: 0
                 },
-
-
-
-                // 添加更多模型配置
             ];
             this.currentConfigIndex = 0; // 默认使用第一个配置
             this.SYSTEM_MESSAGE = {
@@ -322,7 +349,6 @@
             MathJax.typesetPromise([messageElement]);
         }
 
-
         displayMessageStepByStep(message, className) {
             const isCode = message.includes("```");
             if (isCode) {
@@ -387,7 +413,13 @@
             codeInner.className = `language-${language}`;
             codeInner.textContent = codeContent;
 
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-btn';
+            copyButton.textContent = '复制代码';
+            copyButton.addEventListener('click', () => this.copyToClipboard(codeContent));
+
             codeElement.appendChild(codeInner);
+            codeContainer.appendChild(copyButton);  // 将复制按钮添加到代码框
             codeContainer.appendChild(codeElement);
             messageElement.appendChild(codeContainer);
 
@@ -396,6 +428,33 @@
 
             Prism.highlightElement(codeInner);
             MathJax.typesetPromise([messageElement]);
+        }
+
+        copyToClipboard(codeContent) {
+            // 创建一个临时文本框
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+
+            // 选中并复制
+            tempTextArea.select();
+            document.execCommand('copy');
+
+            // 删除临时文本框
+            document.body.removeChild(tempTextArea);
+
+            // 创建并显示复制成功提示
+            const copyMessage = document.createElement('div');
+            copyMessage.className = 'copy-message';
+            copyMessage.textContent = '代码已复制!';
+            
+            // 将提示信息添加到页面
+            document.body.appendChild(copyMessage);
+
+            // 设置定时器，2秒后自动移除提示信息
+            setTimeout(() => {
+                copyMessage.remove();
+            }, 2000); // 2000毫秒 = 2秒
         }
 
         clearMessages() {
