@@ -1,42 +1,469 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
+    <!-- MathJax for rendering mathematical expressions -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>左右容器示例</title>
-    <style>
-        /* 设置容器的布局 */
-        .container {
+    <title>玖数动画演示</title>
+    <link rel="icon" href="faviconkimi.ico" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js" defer></script>
+    
+<style>
+        /* General Layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f8;
             display: flex;
-            height: 100vh; /* 全屏高度 */
+            justify-content: space-between;
+            height: 100vh;
         }
-        /* 左侧容器占 30% 宽度 */
-        .left {
-            width: 30%;
-            border-right: 2px solid #ccc;
+        #chat-container {
+            flex: 0 1 45%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
         }
-        /* 右侧容器占 70% 宽度 */
-        .right {
-            width: 70%;
+        #preview-container {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
         }
-        /* iframe样式，使其填满容器 */
-        iframe {
-            width: 100%;
-            height: 100%;
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            font-size: 1rem;
+        }
+        .message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .user-message {
+            background-color: #daf7a6;
+            align-self: flex-end;
+        }
+        .assistant-message {
+            background-color: #ffeb99;
+            align-self: flex-start;
+        }
+        .message-content {
+            flex: 1;
+            word-break: break-word;
+        }
+        #input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            resize: vertical;
+            background-color: #f9f9f9;
+        }
+        #send-btn, #refresh-btn {
+            padding: 10px 15px;
             border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        #send-btn:disabled {
+            background-color: #cfcfcf;
+            cursor: not-allowed;
+        }
+        #send-btn:hover {
+            background-color: #0056b3;
+        }
+        #refresh-btn:hover {
+            background-color: #e6f7ff;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        #preview-iframe {
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        pre {
+            background-color: #090909;
+            padding: 0px;
+            border-radius: 3px;
+            overflow: auto;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        /* Copy button */
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #45a049;
+        }
+
+        #copy-message {
+            display: none;
+            color: green;
+            font-size: 0.8em;
+            background-color: #f0f8ff;
+            padding: 5px;
+            border-radius: 5px;
+            position: absolute;
+            top: 10px;
+            right: 20px;
         }
     </style>
+
 </head>
 <body>
+    <div id="chat-container">
+        <h3 id="title">玖数动画演示</h3>
+        
+        <div id="model-selector-container" style="text-align: center; margin-bottom: 10px;">
+            <label for="model-selector">选择模型：</label>
+            <select id="model-selector">
+                <!-- 下拉菜单选项将由JavaScript动态生成 -->
+            </select>
+        </div>
+        
+        <div id="messages"></div>
 
-<div class="container">
-    <div class="left">
-        <iframe src="1.html"></iframe>
-    </div>
-    <div class="right">
-        <iframe src="precode.html"></iframe>
-    </div>
-</div>
+        <div id="loading">正在思考中...</div>
 
+        <div id="input-container">
+            <textarea id="user-input" placeholder="输入你的消息..." rows="1"></textarea>
+            <button id="send-btn" disabled>发送</button>
+        </div>
+        <button id="refresh-btn">清除对话</button>
+    </div>
+
+    <div id="preview-container">
+
+
+      
+        <iframe id="preview-iframe"></iframe>
+       <button id="run-btn">运行代码</button>
+        <h3>HTML 代码预览</h3>
+
+        <textarea id="code-input" placeholder="编辑HTML代码..." rows="10"></textarea>
+    </div>
+
+    <script>
+    const runButton = document.getElementById("run-btn");
+    const previewIframe = document.getElementById("preview-iframe");
+    const codeInput = document.getElementById("code-input");
+
+    // 监听点击按钮来更新iframe内容
+    runButton.addEventListener("click", () => {
+        const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(codeInput.value);
+        iframeDoc.close();
+    });
+
+    class ChatApp {
+        constructor() {
+            this.CONFIG = [
+
+       
+
+
+                {
+                    name: "Grok Beta",
+                    apiUrl: "https://api.x.ai/v1/chat/completions",
+                    apiKey: "xai-1vaHLycBuJvgZoVN2Fhwyt2LWTj3fxMy279O6DsPsOEto0ngsYRZgybenuhU0NNiQCgb8GyCbv3ool6x",
+                    model: "grok-beta",
+                    temperature: 0
+                },
+
+
+
+         {
+                    name: "deepseek",
+                    apiUrl: "https://api.deepseek.com/v1/chat/completions",
+                    apiKey: "sk-fcbf2bbe549a4f1bb8020e88ff0af42b",
+                    model: "deepseek-coder",
+                    temperature: 0
+                },
+                {
+                    name: "glm-4-flashX",
+                    apiUrl: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+                    apiKey: "046acb99c5a6dd6680049c766c8b454b.Jc1U4euX045uExXU",
+                    model: "glm-4-flashX",
+                    temperature: 0
+                },
+                {
+                    name: "glm-4-flash",
+                    apiUrl: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+                    apiKey: "046acb99c5a6dd6680049c766c8b454b.Jc1U4euX045uExXU",
+                    model: "glm-4-flash",
+                    temperature: 0
+                },
+                {
+                    name: "qwen-plus",
+                    apiUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+                    apiKey: "sk-56f75127a91347509775ef3f3a7573d6",
+                    model: "qwen-plus",
+                    temperature: 0
+                },
+            ];
+            this.currentConfigIndex = 0; // 默认使用第一个配置
+            this.SYSTEM_MESSAGE = {
+                "role": "system",
+                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。图形变化通过颜色、线条、形状、大小等方式展示，用户可以通过操作页面中的点观察参数变化。如果是函数就显示动点的坐标变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强。"
+            };
+            this.messages = [this.SYSTEM_MESSAGE];
+            this.initElements();
+            this.populateModelSelector();
+            this.addEventListeners();
+        }
+
+        initElements() {
+            this.messagesContainer = document.getElementById('messages');
+            this.userInput = document.getElementById('user-input');
+            this.sendBtn = document.getElementById('send-btn');
+            this.refreshBtn = document.getElementById('refresh-btn');
+            this.loadingIndicator = document.getElementById('loading');
+            this.modelSelector = document.getElementById('model-selector');
+        }
+
+        populateModelSelector() {
+            this.CONFIG.forEach((config, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = config.name;
+                this.modelSelector.appendChild(option);
+            });
+        }
+
+        addEventListeners() {
+            this.userInput.addEventListener('input', () => this.updateSendButtonState());
+            this.userInput.addEventListener('keydown', (event) => this.handleKeyDown(event));
+            this.sendBtn.addEventListener('click', () => this.handleSendMessage());
+            this.refreshBtn.addEventListener('click', () => this.handleRefreshConversation());
+            this.modelSelector.addEventListener('change', (event) => this.handleModelChange(event));
+        }
+
+        updateSendButtonState() {
+            this.sendBtn.disabled = this.userInput.value.trim().length === 0;
+        }
+
+        autoResizeInput() {
+            this.userInput.style.height = 'auto';
+            this.userInput.style.height = (this.userInput.scrollHeight) + 'px';
+        }
+
+        handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                if (event.shiftKey || event.ctrlKey) {
+                    this.userInput.value += '\n';
+                    this.autoResizeInput();
+                } else {
+                    event.preventDefault();
+                    this.handleSendMessage();
+                }
+            }
+        }
+
+        handleSendMessage() {
+            const userMessage = this.userInput.value.trim();
+            if (userMessage.length > 0) {
+                this.addMessage('user', userMessage);
+                this.sendToApi(userMessage);
+                this.userInput.value = ''; // 清空输入框
+                this.autoResizeInput(); // 重新调整输入框高度
+            }
+        }
+
+        async sendToApi(message) {
+            this.showLoadingIndicator(true);
+            const selectedConfig = this.CONFIG[this.currentConfigIndex];
+            try {
+                const response = await fetch(selectedConfig.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${selectedConfig.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: selectedConfig.model,
+                        messages: [...this.messages, { role: 'user', content: message }],
+                        temperature: selectedConfig.temperature
+                    })
+                });
+
+                const data = await response.json();
+                if (data && data.choices && data.choices.length > 0) {
+                    const assistantMessage = data.choices[0].message.content;
+                    this.addMessage('assistant', assistantMessage);
+
+                    // 提取 HTML 内容
+                    const htmlCode = this.extractHtmlCode(assistantMessage);
+
+                    // 自动运行AI回复的HTML代码
+                    this.runHtmlCode(htmlCode);
+                } else {
+                    this.addMessage('assistant', '抱歉，我没有收到有效的响应。');
+                }
+            } catch (error) {
+                this.addMessage('assistant', `请求失败: ${error.message}`);
+            } finally {
+                this.showLoadingIndicator(false);
+            }
+        }
+
+        extractHtmlCode(message) {
+            const match = message.match(/<html[\s\S]*<\/html>/);
+            return match ? match[0] : '';  // 返回匹配到的 HTML 内容
+        }
+
+        runHtmlCode(htmlCode) {
+            const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(htmlCode);
+            iframeDoc.close();
+        }
+
+        showLoadingIndicator(isVisible) {
+            this.loadingIndicator.style.display = isVisible ? 'block' : 'none';
+        }
+
+addMessage(role, content) {
+    const messageElem = document.createElement('div');
+    messageElem.classList.add('message', role === 'user' ? 'user-message' : 'assistant-message');
+    const contentElem = document.createElement('div');
+    contentElem.classList.add('message-content');
+
+    // 检查是否包含代码块
+    if (content.includes('```')) {
+        // 将代码块内容提取并格式化
+        const codeMatch = content.match(/```([a-zA-Z0-9]*)\n([\s\S]*?)\n```/);
+        if (codeMatch) {
+            const lang = codeMatch[1];  // 获取代码语言
+            const code = codeMatch[2];  // 获取代码内容
+
+            // 创建一个容器来包裹代码块和复制按钮
+            const preContainer = document.createElement('div');
+            preContainer.classList.add('pre-container'); // 为代码容器添加类
+
+            const preElem = document.createElement('pre');
+            const codeElem = document.createElement('code');
+            codeElem.classList.add(`language-${lang}`); // 添加语言类以便高亮
+            codeElem.textContent = code;
+            preElem.appendChild(codeElem);
+
+            // 创建复制按钮
+            const copyBtn = document.createElement('button');
+            copyBtn.classList.add('copy-btn');
+            copyBtn.textContent = '复制代码';
+            copyBtn.onclick = () => this.copyCode(code);
+
+            // 将复制按钮和代码块放入容器中
+            preContainer.appendChild(copyBtn);
+            preContainer.appendChild(preElem);
+
+            contentElem.appendChild(preContainer);
+        }
+    } else {
+        // 非代码内容
+        contentElem.textContent = content;
+    }
+
+    messageElem.appendChild(contentElem);
+    this.messagesContainer.appendChild(messageElem);
+    this.messages.push({ role, content });
+    this.scrollToBottom();
+}
+
+
+        copyCode(code) {
+            // 使用 clipboard API 复制代码
+            navigator.clipboard.writeText(code).then(() => {
+                this.showCopyMessage(true);
+            });
+        }
+
+        showCopyMessage(isVisible) {
+            const messageElem = document.createElement('div');
+            messageElem.id = 'copy-message';
+            messageElem.textContent = '代码已复制!';
+            document.body.appendChild(messageElem);
+
+            setTimeout(() => {
+                messageElem.style.display = 'none';
+            }, 2000);
+
+            messageElem.style.display = 'block';
+        }
+
+        scrollToBottom() {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }
+
+        handleRefreshConversation() {
+            this.messages = [this.SYSTEM_MESSAGE];
+            this.messagesContainer.innerHTML = '';
+            this.userInput.value = '';
+        }
+
+        handleModelChange(event) {
+            this.currentConfigIndex = parseInt(event.target.value);
+        }
+    }
+
+    const chatApp = new ChatApp();
+    </script>
 </body>
 </html>
