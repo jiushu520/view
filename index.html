@@ -335,8 +335,12 @@ runButton.addEventListener("click", () => {
                 this.sendToApi(userMessage);
                 this.userInput.value = ''; // 清空输入框
                 this.autoResizeInput(); // 重新调整输入框高度
+        // 触发 runButton 的点击事件
+        runButton.click();
             }
         }
+
+
 
         async sendToApi(message) {
             this.showLoadingIndicator(true);
