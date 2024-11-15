@@ -231,12 +231,12 @@ pre {
     const codeInput = document.getElementById("code-input");
 
     // 监听点击按钮来更新iframe内容
-    runButton.addEventListener("click", () => {
-        const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(codeInput.value);
-        iframeDoc.close();
-    });
+runButton.addEventListener("click", () => {
+    const codeWithCacheBuster = codeInput.value.replace(/src="(.+?)"/g, 'src="$1?' + new Date().getTime() + '"');
+    previewIframe.srcdoc = codeWithCacheBuster;
+});
+
+
 
     class ChatApp {
         constructor() {
