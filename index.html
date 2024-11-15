@@ -328,17 +328,28 @@ runButton.addEventListener("click", () => {
             }
         }
 
-        handleSendMessage() {
-            const userMessage = this.userInput.value.trim();
-            if (userMessage.length > 0) {
-                this.addMessage('user', userMessage);
-                this.sendToApi(userMessage);
-                this.userInput.value = ''; // 清空输入框
-                this.autoResizeInput(); // 重新调整输入框高度
+
+handleSendMessage() {
+    const userMessage = this.userInput.value.trim();
+    if (userMessage.length > 0) {
+        this.addMessage('user', userMessage);
+        this.sendToApi(userMessage);
+        this.userInput.value = ''; // 清空输入框
+        this.autoResizeInput(); // 重新调整输入框高度
+
+        // 清空代码预览框和 iframe 内容
+        codeInput.value = ''; // 清空代码输入框
+        const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(''); // 清空 iframe
+        iframeDoc.close();
+
         // 触发 runButton 的点击事件
         runButton.click();
-            }
-        }
+    }
+}
+
+
 
 
 
