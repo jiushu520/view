@@ -241,25 +241,26 @@ runButton.addEventListener("click", () => {
     class ChatApp {
         constructor() {
             this.CONFIG = [
-                {
+              {
                     name: "Grok Beta",
                     apiUrl: "https://api.x.ai/v1/chat/completions",
                     apiKey: "xai-1vaHLycBuJvgZoVN2Fhwyt2LWTj3fxMy279O6DsPsOEto0ngsYRZgybenuhU0NNiQCgb8GyCbv3ool6x",
                     model: "grok-beta",
                     temperature: 0
-                },
+                }, 
+
                 {
-                    name: "glm-4-flashX",
+                    name: "codegeex-4",
                     apiUrl: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
                     apiKey: "046acb99c5a6dd6680049c766c8b454b.Jc1U4euX045uExXU",
-                    model: "glm-4-flashX",
+                    model: "codegeex-4",
                     temperature: 0
                 },
                 {
-                    name: "glm-4-flash",
+                    name: "glm-4-plus",
                     apiUrl: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
                     apiKey: "046acb99c5a6dd6680049c766c8b454b.Jc1U4euX045uExXU",
-                    model: "glm-4-flash",
+                    model: "glm-4-plus",
                     temperature: 0
                 },
                 {
@@ -269,11 +270,21 @@ runButton.addEventListener("click", () => {
                     model: "qwen-plus",
                     temperature: 0
                 },
+
+               {
+                    name: "deepseek-coder",
+                    apiUrl: "https://api.deepseek.com/v1/chat/completions",
+                    apiKey: "sk-fd790ecc4101410bb877daa5b6a9a5c1",
+                    model: "deepseek-coder",
+                    temperature: 0
+                },
+
+
             ];
             this.currentConfigIndex = 0; // 默认使用第一个配置
             this.SYSTEM_MESSAGE = {
                 "role": "system",
-                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。图形变化通过颜色、线条、形状、大小等方式展示，不同步骤通过按钮控制，用户可以通过操作按钮或者滑块观察参数变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强。画布一般宽800，高450。坐标原点位于画布中心。"
+                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。如果是函数，加入控件，以观察函数的性质变化。图形变化通过颜色、线条、形状、大小等方式展示，不同步骤通过按钮控制，用户可以通过操作按钮或者滑块观察参数变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强。画布一般宽800，高450。坐标原点位于画布中心。"
             };
             this.messages = [this.SYSTEM_MESSAGE];
             this.initElements();
