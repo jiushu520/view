@@ -244,7 +244,7 @@ runButton.addEventListener("click", () => {
               {
                     name: "Grok Beta",
                     apiUrl: "https://api.x.ai/v1/chat/completions",
-                    apiKey: "xai-3DNgwRHMO2NA8cpCbuXocWXS4WoOmoUuyIHdtCNQ6SqLAROVNlPffNlvHDPd5VOaRZGT5crIMGoizWpn",
+                    apiKey: "xai-1vaHLycBuJvgZoVN2Fhwyt2LWTj3fxMy279O6DsPsOEto0ngsYRZgybenuhU0NNiQCgb8GyCbv3ool6x",
                     model: "grok-beta",
                     temperature: 0
                 }, 
@@ -284,7 +284,7 @@ runButton.addEventListener("click", () => {
             this.currentConfigIndex = 0; // 默认使用第一个配置
             this.SYSTEM_MESSAGE = {
                 "role": "system",
-                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。如果是函数，加入控件，以观察函数的性质变化。图形变化通过颜色、线条、形状、大小等方式展示，不同步骤通过按钮控制，用户可以通过操作按钮或者滑块观察参数变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强。画布一般宽800，高450。坐标原点位于画布中心。"
+                "content": "你是一个有二十年经验的数学教师与前端开发者，精通数学与编程，根据用户给要求，编写html相关文件，如果没有特别要求，写一个html演示相关的数学原理。确保一定可以进行latex的渲染。注意排版，画布一般宽800，高450。坐标原点位于画布中心。"
             };
             this.messages = [this.SYSTEM_MESSAGE];
             this.initElements();
