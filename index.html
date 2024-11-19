@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <!-- MathJax for rendering mathematical expressions -->
-     <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script>
     window.MathJax = {
       tex: {
@@ -237,6 +237,15 @@ runButton.addEventListener("click", () => {
     previewIframe.srcdoc = codeWithCacheBuster;
 });
 
+// 监听 textarea 的 input 事件
+codeInput.addEventListener("input", () => {
+    // 动态更新 iframe 内容
+    const codeWithCacheBuster = codeInput.value.replace(/src="(.+?)"/g, 'src="$1?' + new Date().getTime() + '"');
+    previewIframe.srcdoc = codeWithCacheBuster;
+});
+
+
+
 
 
     class ChatApp {
@@ -285,7 +294,7 @@ runButton.addEventListener("click", () => {
             this.currentConfigIndex = 0; // 默认使用第一个配置
             this.SYSTEM_MESSAGE = {
                 "role": "system",
-                "content": "你是一个有二十年经验的数学教师与前端开发者，精通数学与编程，根据用户给要求，编写html相关文件，如果没有特别要求，写一个html演示相关的数学原理。确保一定可以进行latex的渲染。注意排版，画布一般宽800，高450。坐标原点位于画布中心。"
+                "content": "通过动态图形展示数学原理，减少文字使用，利用HTML生成逐步呈现的数学解题动图。生成代码之前务必要通盘考虑之后才生成。从用户理解，操作，还有回馈式奖赏的原理去设计代码。要自我问答，直接找到最符合学生学习数学方式。如果是函数，加入控件，以观察函数的性质变化。图形变化通过颜色、线条、形状、大小等方式展示，不同步骤通过按钮控制，用户可以通过操作按钮或者滑块观察参数变化。动态过程避免过多的文字描述，尽量以图形或图像的变化代替，确保清晰、直观且互动性强。画布一般宽800，高450。坐标原点位于画布中心。"
             };
             this.messages = [this.SYSTEM_MESSAGE];
             this.initElements();
@@ -500,6 +509,10 @@ addMessage(role, content) {
             this.currentConfigIndex = parseInt(event.target.value);
         }
     }
+
+
+
+
 
     const chatApp = new ChatApp();
     </script>
